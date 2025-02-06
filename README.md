@@ -1,7 +1,18 @@
-# New Curtailment Data Pipeline
+# New Curtailment Data Pipeline:
 Data reconciliation service:
 
-## Real-time Updates (Every 15 minutes):
+## Data Sources:
+Primary data comes from Elexon BMRS API via elexon.ts
+Wind farm BMUs (Balancing Mechanism Units) mappings are stored in bmuMapping.json
+minerstat API used for current exchange rate
+Our own DynamoDB used for historical difficulty levels 
+
+# Ingestion Process:
+Data is ingested daily through processDailyCurtailment function in curtailment.ts
+Each day is processed in 48 settlement periods (half-hourly intervals)
+
+## Real-time Auto Updates (Every 15 minutes):
+The system runs a data update service (dataUpdater.ts)
 The service checks for new data from the Elexon API
 Updates the current day's data if any changes are detected
 
@@ -11,11 +22,13 @@ Compares our database with the Elexon API across multiple periods (1, 12, 24, 36
 If differences are found (>1 MWh or >£10), it automatically reprocesses that day's data
 
 ## daily reconciliation for the previous month's data:
-
 It runs daily at 2 AM (before the regular 7-day reconciliation at 3 AM)
 Processes the entire previous month's data to catch any retroactive updates
 Uses the same thorough comparison logic as the 7-day reconciliation
 Shows detailed logs of any discrepancies found and corrections made
+
+## On-demand Reconciliation: 
+Available through reprocessDay.ts script
 
 ## Data Verification:
 Checks both volume and payment data
@@ -25,6 +38,17 @@ Uses more granular logging to track any discrepancies
 ## Batch Processing:
 Processes up to 5 days concurrently for efficiency
 Includes automatic retries if API calls fail
+
+## Data Storage:
+Records are stored in PostgreSQL database across multiple tables:
+- curtailmentRecords: Individual curtailment events
+- dailySummaries: Aggregated daily totals (MWh and £)
+- monthlySummaries: Monthly aggregations (MWh and £)
+- yearlySummaries: Yearly aggregations (MWh and £)
+- historicalBitcoinCalculations: Historical Bitcoin calculations are stored in the 
+
+
+AWS DynamoDB for stored Difficulty levels used to calculate MWh to Bitcoin conversion
 
 # MWh to Bitcoin conversion:
 ## Data Collection & Storage:
