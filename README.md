@@ -50,6 +50,11 @@ Records are stored in PostgreSQL database across multiple tables:
 
 AWS DynamoDB for stored Difficulty levels used to calculate MWh to Bitcoin conversion
 
+## The sign convention:
+Negative £ values in DB → Positive display (payments TO farms)
+Positive £ values in DB → Negative display (payments FROM farms)
+the MWh energy values can be negative or positive in DB => display absolute numbers since they represent physical quantities
+
 # MWh to Bitcoin conversion:
 ## Data Collection & Storage:
 Fetching curtailment data (in MWh) from wind farms (via the Elexon API), processing the records (filtering by negative volumes and flags), and storing them in a PostgreSQL database.
