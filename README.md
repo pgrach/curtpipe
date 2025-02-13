@@ -1,5 +1,26 @@
-# New Curtailment Data Pipeline:
-Data reconciliation service:
+This application analyzes the potential of using curtailed wind farm energy for Bitcoin mining. 
+
+Here's what it does:
+
+## Energy Analysis:
+- Tracks real-time wind farm curtailment data
+- Monitors energy curtailment across different wind farms
+- Calculates total available energy for mining
+- Bitcoin Mining Calculations:
+
+## Supports multiple ASIC miner models (S19J Pro, S9, M20S)
+- Calculates potential Bitcoin mining output based on available (curtailed) energy
+- Tracks network difficulty and adjusts calculations accordingly
+
+## Financial Analysis:
+- Provides real-time profitability calculations
+- Compares curtailment payments vs potential mining revenue
+- Tracks historical performance and projections
+
+## Data Visualization:
+- Interactive charts showing hourly curtailment data
+- Daily, monthly, and yearly summaries
+- Real-time difficulty and price monitoring
 
 ## Data Sources:
 Primary data comes from Elexon BMRS API via elexon.ts
