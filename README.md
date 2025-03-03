@@ -71,6 +71,21 @@ Records are stored in PostgreSQL database across multiple tables:
 
 AWS DynamoDB for stored Difficulty levels used to calculate MWh to Bitcoin conversion
 
+Primary Tables:
+- curtailment_records: Stores detailed wind farm curtailment data at the settlement period level
+- historical_bitcoin_calculations: Contains Bitcoin mining calculations based on curtailed energy
+
+Summary Tables:
+- daily_summaries: Aggregates curtailment data by day
+- monthly_summaries: Aggregates curtailment data by month
+- yearly_summaries: Aggregates curtailment data by year
+- bitcoin_monthly_summaries: Summarizes Bitcoin calculations by month
+
+Key relationship:
+- Summary tables are derived from the primary tables
+- Controllers often query both the summary tables AND re-calculate from primary tables
+- Each update to the primary tables triggers cascading updates to all summary tables
+
 ## The sign convention:
 Negative £ values in DB → Positive display (payments TO farms)
 Positive £ values in DB → Negative display (payments FROM farms)
@@ -93,3 +108,6 @@ NB: So far I restrict the calculation to only process data for today’s date. T
 ## Frontend Display:
 React frontend uses React Query to fetch the summary data (daily, monthly, yearly, and hourly) and the Bitcoin mining potential.
 The UI components (cards, charts, filter bars) display the curtailed energy, potential Bitcoin mining amounts, and corresponding fiat values, along with hourly breakdowns in charts.
+
+
+
