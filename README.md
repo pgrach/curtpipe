@@ -110,4 +110,37 @@ React frontend uses React Query to fetch the summary data (daily, monthly, yearl
 The UI components (cards, charts, filter bars) display the curtailed energy, potential Bitcoin mining amounts, and corresponding fiat values, along with hourly breakdowns in charts.
 
 
+## FAQ:
+Why £/MHh per Bitcoin for each hour is different from hour to hour despite the difficulty remaining constant?
+
+Why Bitcoin Value (£/MWh) Varies Throughout the Day
+The Bitcoin value per MWh appears to fluctuate from hour to hour because of how the calculations are being performed in our system. There are several key factors causing this:
+
+Aggregation Effects:
+
+The hourly data represents multiple settlement periods (each hour has 2 settlement periods)
+When we aggregate these periods into hourly blocks, we're combining data with different characteristics
+Variable Curtailment Volume Distribution:
+
+Each farm has different curtailment volumes at different times
+When we calculate the Bitcoin value per MWh, we're dividing the total Bitcoin mined by the total energy curtailed
+If one period has a very small volume and another has a large volume, the weighted average creates variations
+Calculation Methodology:
+
+Our system calculates Bitcoin mined for each individual curtailment record
+These individual calculations are then aggregated up to hourly values
+This bottom-up approach preserves the variability in the source data
+Looking at the code, specifically in the server/utils/bitcoin.ts file, the Bitcoin calculation uses:
+
+// From the bitcoin.ts utility
+function calculateExpectedBitcoin(totalHashes: number, difficulty: number): number {
+  // The formula uses both difficulty AND total hashes
+  return (totalHashes / difficulty) * 6.25; // 6.25 BTC per block
+}
+While the difficulty is constant for the day, the total hashes computation varies based on the energy amount in each record. When we aggregate these precise calculations to an hourly level, the slight differences between settlement periods become visible.
+
+Would you like me to modify the calculation approach to ensure a more consistent Bitcoin value per MWh across time periods? This would involve normalizing the calculations to better represent the theoretical Bitcoin mining potential per MWh.
+
+
+
 
