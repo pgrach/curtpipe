@@ -23,6 +23,12 @@ Here's what it does:
 - Real-time difficulty and price monitoring
 
 ## Data Sources:
+Elexon:https://developer.data.elexon.co.uk/api-details#api=prod-insol-insights-api&operation=get-balancing-settlement-stack-all-bidoffer-settlementdate-settlementperiod - documentation
+
+GET: https://data.elexon.co.uk/bmrs/api/v1/balancing/settlement/stack/all/{bidOffer}/{settlementDate}/{settlementPeriod}[?format]
+
+soFlag or cadlFlag status
+
 Primary data comes from Elexon BMRS API via elexon.ts
 Wind farm BMUs (Balancing Mechanism Units) mappings are stored in bmuMapping.json
 minerstat API used for current exchange rate
