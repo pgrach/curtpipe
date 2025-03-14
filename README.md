@@ -23,6 +23,8 @@ Here's what it does:
 - Real-time difficulty and price monitoring
 
 ## Data Sources:
+Data from the GB electricity Balancing Mechanism (BM) for a specific wind farm BM Units 
+The Balancing Mechanism is the real-time tool the System Operator (National Grid ESO) uses to match electricity supply and demand.
 Elexon:https://developer.data.elexon.co.uk/api-details#api=prod-insol-insights-api&operation=get-balancing-settlement-stack-all-bidoffer-settlementdate-settlementperiod - documentation
 
 GET: https://data.elexon.co.uk/bmrs/api/v1/balancing/settlement/stack/all/{bidOffer}/{settlementDate}/{settlementPeriod}[?format]
