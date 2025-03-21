@@ -23,7 +23,10 @@ Here's what it does:
 - Real-time difficulty and price monitoring
 
 ## Data Sources:
-Data from the GB electricity Balancing Mechanism (BM) for a specific wind farm BM Units 
+The Elexon Balancing Mechanism Reporting Service (BMRS) stands as a central pillar in the operational transparency of the British electricity market. It functions as a comprehensive repository for a wide array of data encompassing electricity generation, demand patterns, and the actions taken to balance the grid. The primary avenue for obtaining specific information involves interacting with the BMRS Application Programming Interface (API).
+It is important to note that the reported renewable energy output in this section might be an underestimation due to the exclusion of embedded generation and certain wind farms that lack operational meters 
+Data from the GB electricity Balancing Mechanism (BM) for a specific wind farm BM Units. 
+ 
 The Balancing Mechanism is the real-time tool the System Operator (National Grid ESO) uses to match electricity supply and demand.
 Elexon:https://developer.data.elexon.co.uk/api-details#api=prod-insol-insights-api&operation=get-balancing-settlement-stack-all-bidoffer-settlementdate-settlementperiod - documentation
 
