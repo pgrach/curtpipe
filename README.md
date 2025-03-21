@@ -35,7 +35,9 @@ GET: https://data.elexon.co.uk/bmrs/api/v1/balancing/settlement/stack/all/{bidOf
 soFlag or cadlFlag status
 
 Primary data comes from Elexon BMRS API via elexon.ts
-Wind farm BMUs (Balancing Mechanism Units) mappings are stored in bmuMapping.json
+Wind farm BMUs (Balancing Mechanism Units) mappings are stored in bmuMapping.json; 
+The process of obtaining BMU-specific wind generation data involves several steps: 
+1) retrieving the aggregated wind generation data from report B1630; second, obtaining both the comprehensive list of BMUs and the BMU-Fuel Type mapping; third, utilizing the mapping to identify those BMUs categorized as wind generation units; and finally, potentially distributing the aggregated wind generation data among these identified wind BMUs. This final step might require additional data or assumptions, such as the installed capacity of each wind BMU, as the API does not appear to directly provide BMU-level generation for wind through report B1630. 
 minerstat API used for current exchange rate
 Our own DynamoDB used for historical difficulty levels 
 
