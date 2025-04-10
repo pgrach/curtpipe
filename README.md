@@ -1,3 +1,10 @@
+echo "1. Clear existing curtailment records and Bitcoin calculations for $DATE"
+echo "2. Process new curtailment data from Elexon API (unless --skipElexon is used)"
+echo "3. Update daily, monthly, and yearly summaries"
+echo "4. Process Bitcoin calculations for S19J_PRO, S9, and M20S miners"
+echo "5. Verify that all calculations were successful"
+
+
 Data Pipeline Overview
 The data pipeline follows this general flow:
 
