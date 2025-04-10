@@ -1,3 +1,135 @@
+Data Pipeline Overview
+The data pipeline follows this general flow:
+
+Elexon API → curtailment_records → summaries (daily/monthly/yearly) → historical_bitcoin_calculations → bitcoin summary tables
+1. Data Ingestion from Elexon API
+The system fetches curtailment data from the Elexon API using the following process:
+
+The fetchBidsOffers function in server/services/elexon.ts makes API requests to Elexon's API endpoints:
+
+Bids endpoint: ${ELEXON_BASE_URL}/balancing/settlement/stack/all/bid/${date}/${period}
+Offers endpoint: ${ELEXON_BASE_URL}/balancing/settlement/stack/all/offer/${date}/${period}
+The system includes rate limiting to avoid exceeding API limits (4500 requests per minute)
+
+It validates the responses and filters the data to only include wind farms by:
+
+Checking records against a pre-defined set of valid BMU (Balancing Mechanism Unit) IDs from a mapping file
+Filtering for records where volume < 0 and soFlag is true (indicating system operator curtailment)
+Processing 48 settlement periods per day (the UK electricity market uses 48 half-hour settlement periods)
+2. Storing Curtailment Records
+The filtered data is stored in the curtailment_records table:
+
+The processDailyCurtailment function in server/services/curtailment_enhanced.ts processes the data:
+
+It first clears any existing records for the target date to prevent duplicates
+Processes each settlement period (1-48)
+For each valid curtailment record, it creates a database entry with:
+settlementDate: The date (YYYY-MM-DD)
+settlementPeriod: The period (1-48)
+farmId: The BMU ID from Elexon
+leadPartyName: The party responsible for the wind farm
+volume: The curtailed energy in MWh (stored as a negative value)
+payment: The payment for curtailed energy (price * volume)
+The system processes batches of records to optimize database operations
+
+3. Generating Summary Tables
+After populating the curtailment_records table, the system generates various summary tables:
+
+Daily Summaries:
+
+Aggregates curtailment data by day
+Calculates total curtailed energy and payments
+Stores in daily_summaries table
+Monthly Summaries:
+
+Aggregates curtailment data by month
+Updates the monthly_summaries table
+The system will auto-update the monthly summary when a daily summary changes
+Yearly Summaries:
+
+Aggregates curtailment data by year
+Updates the yearly_summaries table
+The system will auto-update the yearly summary when a monthly summary changes
+4. Bitcoin Mining Potential Calculations
+For each curtailment record, the system calculates potential Bitcoin mining:
+
+Historical Bitcoin Calculations:
+
+The processHistoricalCalculations or processBitcoinCalculations functions process each curtailment record
+For each curtailment record and each configured miner model (S19J_PRO, S9, M20S):
+The system calculates how much Bitcoin could be mined using the curtailed energy
+It uses the calculateBitcoin function in server/utils/bitcoin.ts
+Bitcoin calculation formula:
+Convert curtailed MWh to kWh
+Determine how many miners could operate with that energy
+Calculate the potential hash power those miners would produce
+Calculate the Bitcoin that could be mined based on network difficulty
+Network Difficulty Data:
+
+The system fetches Bitcoin network difficulty from DynamoDB using getDifficultyData in server/services/dynamodbService.ts
+If the difficulty isn't available for a specific date, it falls back to a default or the latest known value
+Storing Bitcoin Calculations:
+
+The system stores these calculations in the historical_bitcoin_calculations table
+Each record includes:
+settlementDate: The date
+settlementPeriod: The period (1-48)
+farmId: The BMU ID
+minerModel: The miner model used for calculation
+bitcoinMined: The calculated potential Bitcoin amount
+difficulty: The Bitcoin network difficulty used for calculation
+5. Bitcoin Summary Tables
+Finally, the system generates Bitcoin summary tables:
+
+Bitcoin Daily Summaries:
+
+Aggregates Bitcoin calculations by day for each miner model
+Stores in bitcoin_daily_summaries table
+Bitcoin Monthly Summaries:
+
+Aggregates Bitcoin calculations by month for each miner model
+Stores in bitcoin_monthly_summaries table
+Bitcoin Yearly Summaries:
+
+Aggregates Bitcoin calculations by year for each miner model
+Stores in bitcoin_yearly_summaries table
+6. Additional Data Processing
+The system also includes:
+
+Wind Generation Data:
+
+Stored in the wind_generation_data table
+Updated using functions in server/services/windGenerationService.ts
+Provides context for total wind generation vs. curtailed generation
+Data Verification and Reconciliation:
+
+The system includes tools to verify data integrity (verify_data_integrity.ts)
+It can identify and fix discrepancies between tables (verify_service.ts)
+Reprocessing Capabilities:
+
+Various scripts allow reprocessing of specific dates or ranges
+These scripts maintain data consistency across all dependent tables
+Automatic Update Chain
+The system implements a cascading update mechanism:
+
+When new curtailment records are added, it triggers:
+Daily summary updates
+Bitcoin calculation updates
+When daily summaries are updated, it triggers:
+Monthly summary updates
+Bitcoin daily summary updates
+When monthly summaries are updated, it triggers:
+Yearly summary updates
+Bitcoin monthly summary updates
+When Bitcoin daily summaries are updated, it triggers:
+Bitcoin monthly summary updates
+When Bitcoin monthly summaries are updated, it triggers:
+Bitcoin yearly summary updates
+This ensures that all summary tables remain consistent even when new data is added or existing data is modified.
+
+
+
+
 This application analyzes the potential of using curtailed wind farm energy for Bitcoin mining. 
 
 Here's what it does:
